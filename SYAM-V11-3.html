@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYAM V11.3 - 16 Fitur Terkunci</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#0f0c29;color:#fff}
+header{background:linear-gradient(90deg,#7b2ff7,#ff8c00);padding:14px;text-align:center;position:sticky;top:0;z-index:10}
+.logo{font-size:42px;animation:pulse 1.5s infinite}@keyframes pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px gold)}50%{transform:scale(1.15);filter:drop-shadow(0 0 20px cyan)}}
+.card{background:#fff;color:#222;border-radius:14px;padding:14px;margin:10px}
+button{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;margin:3px}
+.btn-green{background:#25D366}.btn-blue{background:#2563eb;color:#fff}.btn-orange{background:#ff8c00;color:#fff}.btn-red{background:#ef4444;color:#fff}.btn-gold{background:gold}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;margin:5px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hidden{display:none}
+.badge{background:#fee2e2;color:#b91c1c;padding:6px;border-radius:8px;font-size:13px}
+.errBox{background:#fee2e2;color:#7f1d1d;border:2px solid red;padding:12px;border-radius:12px;margin:10px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+</style></head><body>
+<header><div class="logo">💎✨</div><h2 style="margin:4px">SYAM - V11.3</h2><div>Pembuat: Bp. Syam | WA: 6285797240854</div><div id="errTop"></div></header>
+<div style="text-align:center;padding:10px"><div class="tabs">
+<button class="btn-gold" onclick="show('login')">🔐 LOGIN</button>
+<button class="btn-green" onclick="show('belanja')">🛒 BELANJA</button>
+<button class="btn-blue" onclick="show('kasir')">🧾 KASIR</button>
+<button class="btn-orange" onclick="show('hutang')">📒 HUTANG</button>
+<button class="btn-red" onclick="show('errorPage')">⚠️ DAFTAR EROR</button>
+</div></div>
 
+<div id="login" class="card"><h3>🔐 Login - Pusat83</h3>
+<input id="u" placeholder="Username: Pusat83"><input id="p" type="password" placeholder="Password">
+<button class="btn-blue" onclick="doLogin()">MASUK</button><div id="loginMsg"></div>
+<p style="font-size:13px">Pembuat: attalla01 | Penjual: JUAL-A83K | Pembeli: Tanpa Login</p>
+<button class="btn-green" onclick="waSyam('Halo Bp Syam, saya mau dibuatkan aplikasi seperti SYAM')">💬 WA Bp. Syam - Pembuat Aplikasi</button></div>
+
+<div id="belanja" class="card hidden"><h3>🛒 Belanja - <span id="tokoNama">Toko Berkah Jaya</span> ⭐ <span id="ratingAvg">4.9</span></h3>
+<input id="cari" placeholder="🔍 Cari barang..." oninput="render()">
+<div id="notifStok"></div><div id="list" class="grid"></div>
+<h3>🧺 Keranjang</h3><div id="cart"></div>
+<input id="namaPembeli" placeholder="Nama Pembeli (wajib untuk BON)">
+<select id="ambil"><option>AMBIL KE TOKO</option><option>ANTAR KE RUMAH</option></select>
+<input id="alamat" placeholder="Alamat (jika Antar)">
+<input id="ongkir" type="number" placeholder="Ongkir - Diketik Penjual (Rp)">
+<select id="bayar"><option>TUNAI</option><option>TRANSFER</option><option>QRIS</option><option>BON / HUTANG</option></select>
+<input id="bukti" placeholder="Link / Nama File Bukti Transfer">
+<button class="btn-green" onclick="checkout('LUNAS')">✅ BAYAR LUNAS - Kirim WA Penjual</button>
+<button class="btn-orange" onclick="checkout('BON')">📒 BON / HUTANG - Kirim WA Penjual</button>
+<button class="btn-blue" onclick="pesanLagi()">🔁 PESAN LAGI</button>
+<h4>⭐ Rating Toko</h4><select id="rate"><option>⭐⭐⭐⭐⭐</option><option>⭐⭐⭐⭐</option><option>⭐⭐⭐</option></select><input id="ulasan" placeholder="Tulis ulasan: Cepat, barang lengkap"><button class="btn-gold" onclick="kirimRating()">KIRIM RATING</button><div id="ratingList"></div></div>
+
+<div id="kasir" class="card hidden"><h3>🧾 Kasir Penjual</h3><div id="kasirLock">🔒 Login sebagai Penjual / Pembuat dulu di menu LOGIN</div>
+<div id="kasirIsi" class="hidden"><div id="kasirList"></div>
+<button class="btn-blue" onclick="rekap()">📊 REKAP HARI INI</button><button class="btn-green" onclick="kirimRekapWA()">📤 Kirim Rekap ke WA Saya</button><div id="rekapOut"></div>
+<h4>📦 Status Pesanan</h4><div id="statusList"></div></div></div>
+
+<div id="hutang" class="card hidden"><h3>📒 Daftar Hutang</h3><div id="hutangList"></div></div>
+<div id="errorPage" class="card hidden"><h3>⚠️ Daftar Eror - Hanya Pembuat</h3><div id="errorList">Belum ada eror tercatat.</div><button class="btn-red" onclick="laporkanError('Manual','E-999')">📤 LAPORKAN EROR KE PEMBUAT</button></div>
+
+<script>
+let barang=[{id:1,nama:'Indomie Goreng',harga:3500,stok:12},{id:2,nama:'Beras Premium 5kg',harga:65000,stok:4},{id:3,nama:'Minyak Goreng 2L',harga:32000,stok:8},{id:4,nama:'Gula Pasir 1kg',harga:16000,stok:3},{id:5,nama:'Telur 1kg',harga:28000,stok:15},{id:6,nama:'Kopi Sachet',harga:2000,stok:20}];
+let cart={},hutang=[],pesanan=[],errors=[],ratings=[],lastOrder=null,role='pembeli',toko='Toko Berkah Jaya',waPenjual='6281234567890',waPembuat='6285797240854';
+function show(id){['login','belanja','kasir','hutang','errorPage'].forEach(x=>document.getElementById(x).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');if(id=='hutang')renderHutang();if(id=='kasir')renderKasir();if(id=='belanja')render();}
+function waSyam(pesan){window.open('https://wa.me/'+waPembuat+'?text='+encodeURIComponent(pesan),'_blank')}
+function doLogin(){let u=document.getElementById('u').value.trim(),p=document.getElementById('p').value.trim();
+if(u=='Pusat83'&&p=='attalla01'){role='pembuat';document.getElementById('loginMsg').innerHTML='✅ Login Pembuat Bp. Syam Berhasil';}
+else if(u=='Pusat83'&&p=='JUAL-A83K'){role='penjual';document.getElementById('loginMsg').innerHTML='✅ Login Penjual Berhasil - '+toko;}
+else{reportError('Login','E-101');document.getElementById('loginMsg').innerHTML='❌ Username / Password Salah';return;}
+document.getElementById('kasirLock').classList.add('hidden');document.getElementById('kasirIsi').classList.remove('hidden');renderKasir();}
+function render(){let q=(document.getElementById('cari').value||'').toLowerCase();let h='',warn='';
+barang.forEach(b=>{if(b.nama.toLowerCase().includes(q)){if(b.stok<=5)warn+='<div class="badge">⚠️ Stok '+b.nama+' Tinggal '+b.stok+', Segera Isi Lagi</div>';h+='<div class="card" style="margin:0"><b>'+b.nama+'</b><br>Rp '+b.harga.toLocaleString('id-ID')+'<br>Stok: '+(b.stok==0?'HABIS':b.stok)+'<br><button onclick="addCart('+b.id+')">+ Keranjang</button></div>';}});
+document.getElementById('list').innerHTML=h||'Tidak ditemukan';document.getElementById('notifStok').innerHTML=warn;renderCart();}
+function addCart(id){try{let b=barang.find(x=>x.id==id);if(!b)throw new Error('Barang tidak ditemukan');if(b.stok<=0){alert('Maaf, '+b.nama+' HABIS');return;}cart[id]=(cart[id]||0)+1;renderCart();}catch(e){reportError('Keranjang - addCart','E-102');}}
+function renderCart(){let h='',tot=0;for(let id in cart){let b=barang.find(x=>x.id==id);let sub=b.harga*cart[id];tot+=sub;h+='<div>'+b.nama+' x '+cart[id]+' = Rp '+sub.toLocaleString('id-ID')+' <button onclick="cart['+id+']--;if(cart['+id+']<=0)delete cart['+id+'];renderCart()">-</button> <button onclick="cart['+id+']++;renderCart()">+</button></div>';}document.getElementById('cart').innerHTML=(h||'Keranjang kosong')+'<br><b>Total: Rp '+tot.toLocaleString('id-ID')+'</b>';}
+function checkout(status){try{
+if(Object.keys(cart).length==0){alert('Keranjang masih kosong');return;}
+if(status=='BON'&&!document.getElementById('namaPembeli').value.trim()){alert('Untuk BON, isi Nama Pembeli dulu');return;}
+let nama=document.getElementById('namaPembeli').value.trim()||'Pembeli';
+let ongkir=parseInt(document.getElementById('ongkir').value||0);let ambil=document.getElementById('ambil').value;let bayar=document.getElementById('bayar').value;
+let items=[],tot=0;for(let id in cart){let b=barang.find(x=>x.id==id);if(b.stok<cart[id])throw new Error('Stok kurang');items.push(b.nama+' x '+cart[id]);tot+=b.harga*cart[id];}
+let total=tot+ongkir;let tgl=new Date().toLocaleString('id-ID');
+let order={nama,items,total,ambil,bayar,status:'MENUNGGU',tgl,ongkir};pesanan.push(order);lastOrder=JSON.parse(JSON.stringify(cart));
+for(let id in cart){let b=barang.find(x=>x.id==id);b.stok-=cart[id];}
+if(status=='BON'){hutang.push({nama,tgl,items:items.join(', '),total,status:'BELUM LUNAS'});}
+let pesan='Halo '+toko+', saya '+nama+' mau pesan: '+items.join(', ')+' | '+ambil+' | Bayar: '+bayar+' | Status: '+status+' | Ongkir: Rp '+ongkir.toLocaleString('id-ID')+' | TOTAL: Rp '+total.toLocaleString('id-ID')+' | Bukti: '+(document.getElementById('bukti').value||'-');
+window.open('https://wa.me/'+waPenjual+'?text='+encodeURIComponent(pesan),'_blank');
+cart={};render();renderHutang();renderKasir();alert('✅ Pesanan terkirim ke WA Penjual! Status: MENUNGGU');
+}catch(e){reportError('Checkout - Tombol Bayar/BON','E-102');}}
+function pesanLagi(){if(!lastOrder){alert('Belum ada pesanan sebelumnya');return;}cart=JSON.parse(JSON.stringify(lastOrder));renderCart();alert('✅ Pesanan terakhir dimasukkan lagi');}
+function renderKasir(){let h='';barang.forEach(b=>{h+='<div>'+b.nama+' - Rp '+b.harga.toLocaleString('id-ID')+' - Stok: '+b.stok+' <button onclick="ubahStok('+b.id+',1)">+</button> <button onclick="ubahStok('+b.id+',-1)">-</button></div>';});document.getElementById('kasirList').innerHTML=h;
+let s='';pesanan.forEach((p,i)=>{s+='<div>'+p.nama+' - '+p.items.join(', ')+' - '+p.status+' <button onclick="gantiStatus('+i+')">➡️ Ganti Status</button></div>';});document.getElementById('statusList').innerHTML=s||'Belum ada pesanan';}
+function ubahStok(id,d){let b=barang.find(x=>x.id==id);b.stok=Math.max(0,b.stok+d);render();renderKasir();}
+function gantiStatus(i){let arr=['MENUNGGU','DIPROSES','SIAP DIAMBIL / DIANTAR','SELESAI'];let cur=arr.indexOf(pesanan[i].status);pesanan[i].status=arr[Math.min(cur+1,3)];renderKasir();alert('Status jadi: '+pesanan[i].status);}
+function renderHutang(){let h='';hutang.forEach((x,i)=>{h+='<div class="card" style="margin:5px 0">'+x.nama+' | '+x.tgl+'<br>'+x.items+'<br>Total: Rp '+x.total.toLocaleString('id-ID')+' | '+x.status+'<br><button class="btn-green" onclick="lunas('+i+')">✅ Tandai LUNAS</button> <button class="btn-green" onclick="tagih('+i+')">💬 WA Tagih Hutang</button></div>';});document.getElementById('hutangList').innerHTML=h||'Belum ada hutang';}
+function lunas(i){hutang[i].status='LUNAS';renderHutang();alert('✅ Hutang '+hutang[i].nama+' sudah LUNAS');}
+function tagih(i){let x=hutang[i];window.open('https://wa.me/'+waPenjual+'?text='+encodeURIComponent('Halo '+x.nama+', hutang Anda Rp '+x.total.toLocaleString('id-ID')+' ('+x.items+') tanggal '+x.tgl+' masih BELUM LUNAS. Mohon segera dibayar ya. Terima kasih - '+toko),'_blank');}
+function rekap(){let total=pesanan.reduce((a,p)=>a+p.total,0);let bon=hutang.filter(x=>x.status=='BELUM LUNAS').length;document.getElementById('rekapOut').innerHTML='<div class="card">📊 REKAP HARI INI<br>Jual: Rp '+total.toLocaleString('id-ID')+'<br>Pesanan: '+pesanan.length+'<br>BON Belum Lunas: '+bon+' orang<br>'+hutang.map(x=>x.nama+' - Rp '+x.total.toLocaleString('id-ID')).join('<br>')+'</div>';}
+function kirimRekapWA(){let t=document.getElementById('rekapOut').innerText||'Rekap Hari Ini';window.open('https://wa.me/'+waPenjual+'?text='+encodeURIComponent(t),'_blank');}
+function kirimRating(){let r=document.getElementById('rate').value;let u=document.getElementById('ulasan').value;ratings.push(r+' - '+u);document.getElementById('ratingList').innerHTML=ratings.map(x=>'<div>⭐ '+x+'</div>').join('');alert('✅ Terima kasih ratingnya!');}
+function reportError(lokasi,kode){let e={lokasi,kode,waktu:new Date().toLocaleString('id-ID')};errors.push(e);
+document.getElementById('errTop').innerHTML='<div class="errBox">⚠️ MAAF, SISTEM EROR<br>Letak Eror: '+lokasi+'<br>Kode Eror: '+kode+'<br><button onclick="laporkanError(\''+lokasi+'\',\''+kode+'\')">📤 Laporkan ke Pembuat</button></div>';
+document.getElementById('errorList').innerHTML=errors.map(x=>'<div>'+x.waktu+' - '+x.lokasi+' - '+x.kode+'</div>').join('');}
+function laporkanError(lokasi,kode){waSyam('Halo Bp Syam, ada eror di SYAM. Letak Eror: '+lokasi+' Kode: '+kode+' Waktu: '+new Date().toLocaleString('id-ID'));}
+window.onerror=function(msg,src,line){reportError('Sistem - Line '+line,'E-500');return false;}
+render();
+</script></body></html>
