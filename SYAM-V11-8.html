@@ -70,7 +70,6 @@ input,select,textarea{width:100%;padding:12px;margin:6px 0;border-radius:12px;bo
 </div>
 <div class="keranjang"><b>🛒 <span id="total">Rp 0</span> • <span id="jumlahKeranjang">0 item</span></b><button onclick="pindahHalaman('pesan',document.querySelectorAll('.topnav button')[2])" style="background:#22c55e;color:#fff;border:none;padding:12px 18px;border-radius:12px;font-weight:800">Pesan Online →</button></div>
 <script>
-// FIX 1: localStorage aman - tidak crash di private/file://
 function safeGet(k,d){try{var v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}
 function safeSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 function waLink(teks){return 'https://wa.me/'+WA_WARUNG+'?text='+encodeURIComponent(teks)}
@@ -86,7 +85,6 @@ function tampil(){let cari=(document.getElementById('cariInput')?document.getEle
 function ubahHarga(i,d){BARANG[i].h=Math.max(0,BARANG[i].h+d);tampil()}
 function editHarga(i){let h=prompt('Harga baru untuk '+BARANG[i].n+'?',BARANG[i].h);if(h!==null&&h!==''){let v=parseInt(h);if(!isNaN(v)&&v>=0){BARANG[i].h=v;tampil()}}}
 function ubahStok(i,d){BARANG[i].st=Math.max(0,BARANG[i].st+d);tampil()}
-// FIX: simpan idx barang di keranjang agar stok bisa dikembalikan
 function tambahKeranjang(i,ketengan){let b=BARANG[i];let h=ketengan?2500:b.h;if(b.st<=0){alert('Stok '+b.n+' habis');return}b.st--;KERANJANG.push({idx:i,n:b.n,h:h,ketengan:!!ketengan});RIWAYAT.push({n:b.n+(ketengan?' (Ketengan)':''),h:h,waktu:new Date().toLocaleTimeString('id-ID')});tampil();updateLaporan()}
 function hapusSatuKeranjang(pos){let it=KERANJANG[pos];if(it&&BARANG[it.idx])BARANG[it.idx].st++;KERANJANG.splice(pos,1);tampil();updateLaporan()}
 function updateKeranjang(){let tot=KERANJANG.reduce((a,b)=>a+b.h,0);let t=document.getElementById('total');if(t)t.innerText=rupiah(tot);let jk=document.getElementById('jumlahKeranjang');if(jk)jk.innerText=KERANJANG.length+' item';let ki=document.getElementById('kasirIsi');if(ki)ki.innerText=KERANJANG.length?KERANJANG.map(x=>x.n+' - '+rupiah(x.h)).join(', '):'Belum ada';let kt=document.getElementById('kasirTotal');if(kt)kt.innerText=rupiah(tot);let so=document.getElementById('statOmzet');if(so)so.innerText=rupiah(tot);let sp=document.getElementById('statPesanan');if(sp)sp.innerText=PESANAN.length;let ss=document.getElementById('statStok');if(ss)ss.innerText=BARANG.filter(b=>b.st<=5).length;let rw=document.getElementById('riwayat');if(rw)rw.innerHTML=RIWAYAT.length?RIWAYAT.slice(-10).reverse().map(r=>'<div style="padding:8px 0;border-bottom:1px solid #eee">'+r.waktu+' - '+r.n+' - '+rupiah(r.h)+'</div>').join(''):'Belum ada transaksi';let kh=document.getElementById('kasirHapus');if(kh)kh.innerHTML=KERANJANG.map((x,ix)=>'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee"><span>'+x.n+' - '+rupiah(x.h)+'</span><button onclick="hapusSatuKeranjang('+ix+')" style="padding:6px 10px;border:none;border-radius:8px;background:#ef4444;color:#fff">❌ Hapus</button></div>').join('');updatePesan()}
