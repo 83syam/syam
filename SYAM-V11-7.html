@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SYAM-V11.7 - Aplikasi Warung</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui,-apple-system,Arial}body{margin:0;background:#f1f5ff;color:#111827}
+:root{--ungu:#7c3aed;--pink:#ec4899;--orange:#f97316;--hijau:#22c55e;--biru:#2563eb}
+.header{background:linear-gradient(100deg,#7c3aed,#ec4899 45%,#f97316 80%,#38bdf8);color:#fff;padding:22px 16px 26px;text-align:center;border-radius:0 0 28px 28px}
+.header h1{margin:2px 0;font-size:34px;letter-spacing:.5px}.header .sub{opacity:.95}
+.topnav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:12px}
+.topnav button{border:none;padding:12px 14px;border-radius:14px;font-weight:800;cursor:pointer;background:#fff;box-shadow:0 3px 10px #0001}
+.topnav button.on{background:var(--ungu);color:#fff}
+.search{margin:0 14px;background:#fff;border-radius:16px;display:flex;align-items:center;padding:4px 12px;box-shadow:0 4px 14px #0001}
+.search input{border:none;outline:none;width:100%;padding:13px;font-size:16px}
+.catbar{display:flex;gap:8px;overflow:auto;padding:12px 14px;scrollbar-width:none}.catbar::-webkit-scrollbar{display:none}
+.cat{white-space:nowrap;border:none;padding:10px 14px;border-radius:999px;background:#fff;font-weight:700;cursor:pointer;box-shadow:0 2px 8px #0001}
+.cat.on{background:var(--ungu);color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:0 10px 110px}
+.card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 4px 16px #0001;margin:12px 0}
+input,select{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:1px solid #ddd;font-size:15px}
+.btn{border:none;padding:13px;border-radius:14px;font-weight:800;width:100%;margin:5px 0;cursor:pointer}
+.hijau{background:var(--hijau);color:#fff}.biru{background:var(--biru);color:#fff}.kuning{background:#facc15}.abu{background:#e5e7eb}.merah{background:#ef4444;color:#fff}
+.badge{display:inline-block;padding:8px 14px;border-radius:20px;font-weight:800}
+.pembuat{background:#facc15}.penjual{background:#22c55e;color:#fff}.pembeli{background:#f97316;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.item{background:#fff;border-radius:18px;padding:12px;box-shadow:0 4px 14px #0001;display:flex;flex-direction:column}
+.item img{width:100%;height:110px;object-fit:cover;border-radius:12px;background:#f1f5f9}
+.item b{margin:8px 0 2px;line-height:1.2}.kat{font-size:12px;color:#64748b}.harga{color:#16a34a;font-weight:900;font-size:19px;margin:4px 0}.stok{font-size:12px;color:#475569}
+.row{display:flex;gap:5px;margin-top:8px}.row button{flex:1;padding:9px;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;cursor:pointer;font-weight:700}
+.row .edit{background:#fef08a}.row .tambah{background:var(--hijau);color:#fff;border:none}
+.page{display:none}.page.active{display:block}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat div{background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;border-radius:16px;padding:14px;text-align:center}.stat div:nth-child(2){background:linear-gradient(135deg,#059669,#22c55e)}.stat div:nth-child(3){background:linear-gradient(135deg,#ea580c,#f97316)}
+.stat b{font-size:22px;display:block}
+.keranjang{position:fixed;left:12px;right:12px;bottom:12px;max-width:1100px;margin:auto;background:#111827;color:#fff;padding:14px 16px;border-radius:18px;display:flex;justify-content:space-between;align-items:center;z-index:99}
+.keranjang button{background:var(--hijau);color:#fff;border:none;padding:12px 18px;border-radius:12px;font-weight:800;cursor:pointer}
+@media(max-width:768px){.header h1{font-size:28px}.grid{grid-template-columns:1fr 1fr}.stat{grid-template-columns:1fr 1fr}.stat div:last-child{grid-column:span 2}.topnav button{padding:10px;font-size:13px}}
+@media(min-width:769px){.grid{grid-template-columns:repeat(4,1fr)}.search{max-width:1100px;margin:0 auto}}
+</style></head>
+<body>
+<header class="header"><div style="font-size:48px">💎✨</div><h1>SYAM - V11.7</h1><div class="sub" id="namaWarungTampil">Aplikasi Warung - bisa dirubah Penjual</div><div style="font-size:12px;margin-top:4px">Pembuat Aplikasi: Sathorik • HP + Laptop • Desain Profesional</div></header>
+
+<nav class="topnav">
+<button onclick="pindahHalaman('beranda',this)" class="on">🏠 Beranda</button>
+<button onclick="pindahHalaman('belanja',this)">🛒 Belanja</button>
+<button onclick="pindahHalaman('kasir',this)">🧾 Kasir</button>
+<button onclick="pindahHalaman('hutang',this)">📒 Hutang</button>
+<button onclick="pindahHalaman('laporan',this)">📊 Laporan</button>
+<button onclick="pindahHalaman('login',this)">🔒 Login</button>
+</nav>
+
+<div class="wrap">
+<!-- BERANDA -->
+<section id="page-beranda" class="page active">
+<div class="card" style="text-align:center">
+<button onclick="setPeran('PEMBUAT')" style="padding:11px;background:#facc15;border:none;border-radius:12px;font-weight:800">PEMBUAT</button>
+<button onclick="setPeran('PENJUAL')" style="padding:11px;background:#22c55e;color:#fff;border:none;border-radius:12px;font-weight:800">PENJUAL - Edit Langsung</button>
+<button onclick="setPeran('PEMBELI')" style="padding:11px;background:#f97316;color:#fff;border:none;border-radius:12px;font-weight:800">PEMBELI</button>
+<div id="badgeArea" style="margin-top:10px"></div>
+<p style="font-size:12px;color:#64748b">Penjual bisa tambah barang + rubah harga TANPA konfirmasi Pembuat. Harga di bawah TIDAK diotak-atik, sama seperti file V11.6.</p>
+</div>
+<div class="stat"><div><b id="statOmzet">Rp 0</b><span>Omzet Hari Ini</span></div><div><b id="statItem">0</b><span>Item Terjual</span></div><div><b id="statStok">0</b><span>Stok Menipis</span></div></div>
+<div class="card"><b>✏️ Ganti Nama Warung (Penjual)</b><input id="inputNamaWarung" placeholder="Contoh: Warung Berkah"><button class="btn hijau" onclick="simpanNamaWarung()">SIMPAN NAMA WARUNG</button></div>
+<div class="card"><b>🔥 Produk Terlaris</b><p>Indomie Goreng • Minyak Fortune • Beras • Aqua • Magnum</p><button class="btn biru" onclick="pindahHalaman('belanja')">LIHAT SEMUA BARANG →</button></div>
+</section>
+
+<!-- BELANJA -->
+<section id="page-belanja" class="page">
+<div class="search"><span>🔍</span><input id="cariInput" placeholder="Cari barang... Contoh: beras, minyak, indomie, aqua, magnum" oninput="tampil()"></div>
+<div class="catbar" id="catBar">
+<button class="cat on" onclick="filterKat('Semua',this)">Semua</button>
+<button class="cat" onclick="filterKat('Sembako',this)">🍚 Sembako</button>
+<button class="cat" onclick="filterKat('Rokok',this)">🚬 Rokok</button>
+<button class="cat" onclick="filterKat('Minuman',this)">🥤 Minuman</button>
+<button class="cat" onclick="filterKat('Makanan Ringan',this)">🍪 Makanan Ringan</button>
+<button class="cat" onclick="filterKat('Bumbu Dapur',this)">🧂 Bumbu Dapur</button>
+<button class="cat" onclick="filterKat('Perlengkapan Rumah',this)">🧴 Perlengkapan Rumah</button>
+<button class="cat" onclick="filterKat('Lainnya',this)">📦 Lainnya</button>
+</div>
+<div class="card" id="boxTambah" style="display:none"><b>➕ Tambah Barang Baru - Penjual Langsung Jual</b><input id="nBaru" placeholder="Nama Barang"><select id="kBaru"><option>Sembako</option><option>Rokok</option><option>Minuman</option><option>Makanan Ringan</option><option>Bumbu Dapur</option><option>Perlengkapan Rumah</option><option>Lainnya</option></select><input id="hBaru" type="number" placeholder="Harga"><input id="sBaru" type="number" placeholder="Stok"><button class="btn hijau" onclick="tambahLangsungPenjual()">SIMPAN LANGSUNG - JUAL SEKARANG</button></div>
+<p style="padding:0 6px"><b>Produk Tersedia</b> <span id="jumlahProduk" style="color:#64748b"></span></p>
+<div class="grid" id="daftar"></div>
+</section>
+
+<!-- KASIR -->
+<section id="page-kasir" class="page">
+<div class="card"><b>🧾 Kasir - Pembayaran</b><p>Keranjang: <b id="kasirIsi">Belum ada barang</b></p><p>Total: <b id="kasirTotal" style="color:#16a34a;font-size:22px">Rp 0</b></p><input id="uangBayar" type="number" placeholder="Uang Bayar - Contoh: 50000" oninput="hitungKembalian()"><p>Kembalian: <b id="kembalianTampil">Rp 0</b></p><div style="display:flex;gap:8px"><button class="btn" style="background:#f97316;color:#fff" onclick="tambahHutangDariKasir()">📒 JADI HUTANG</button><button class="btn hijau" onclick="kirimStruk()">💬 KIRIM STRUK WA</button></div><button class="btn abu" onclick="kosongkanKeranjang()">🗑️ Kosongkan Keranjang</button></div>
+</section>
+
+<!-- HUTANG -->
+<section id="page-hutang" class="page">
+<div class="card"><b>📒 Daftar Hutang</b><input id="namaHutang" placeholder="Nama Pelanggan - Contoh: Budi"><input id="nominalHutang" type="number" placeholder="Nominal Hutang"><button class="btn" style="background:#f97316;color:#fff" onclick="tambahHutang()">+ TAMBAH HUTANG</button><div id="daftarHutang"></div></div>
+</section>
+
+<!-- LAPORAN -->
+<section id="page-laporan" class="page">
+<div class="card"><b>📊 Laporan Hari Ini</b><p>Total Omzet: <b id="lapOmzet">Rp 0</b></p><p>Total Hutang: <b id="lapHutang">Rp 0</b></p><p>Barang Terjual: <b id="lapItem">0</b></p><p>Stok Habis / Menipis: <b id="lapStok">-</b></p><button class="btn biru" onclick="kirimLaporanWA()">KIRIM LAPORAN KE WA SATHORIK</button></div>
+<div class="card"><b>🧾 Riwayat Transaksi</b><div id="riwayat"></div></div>
+</section>
+
+<!-- LOGIN -->
+<section id="page-login" class="page">
+<div class="card"><b>🔒 Login - Pusat83</b><input id="userLogin" placeholder="Pusat83"><input type="password" placeholder="Password"><button class="btn biru" onclick="loginPusat()">MASUK</button><p style="font-size:12px;text-align:center">Pembuat: atalla01 | Penjual: JUAL-A83K | Pembeli: Tanpa Login</p><button class="btn hijau" onclick="waPembuat()">💬 WA Bp. Syam - Pembuat Aplikasi</button></div>
+</section>
+</div>
+
+<div class="keranjang"><b>🛒 <span id="total">Rp 0</span> • <span id="jumlahKeranjang">0 item</span></b><button onclick="pindahHalaman('kasir')">Checkout →</button></div>
+
+<script>
+const CADANGAN="https://images.unsplash.com/photo-1542838132-92c53300491e?w=500";
+let BARANG=[
+{n:"Beras 1 Kg",k:"Sembako",h:16000,st:20,img:"https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500"},
+{n:"Beras 0.5 Kg",k:"Sembako",h:8000,st:30,img:"https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500"},
+{n:"Minyak Goreng Fortune 1L",k:"Sembako",h:23000,st:35,img:"https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"},
+{n:"Minyak Goreng 2L",k:"Sembako",h:44000,st:10,img:"https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"},
+{n:"Gula Pasir 1 Kg",k:"Sembako",h:19000,st:20,img:"https://images.unsplash.com/photo-1581441363689-1f3c3c414635?w=500"},
+{n:"Telur Ayam 1 Kg",k:"Sembako",h:28000,st:15,img:"https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=500"},
+{n:"Telur Ayam 1 Butir",k:"Sembako",h:2800,st:50,img:"https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=500"},
+{n:"Indomie Goreng",k:"Sembako",h:4000,st:52,img:"https://images.unsplash.com/photo-1585032226651-759b368d7246?w=500"},
+{n:"Indomie Kuah",k:"Sembako",h:4000,st:40,img:"https://images.unsplash.com/photo-1585032226651-759b368d7246?w=500"},
+{n:"Sarimi",k:"Sembako",h:3500,st:30,img:"https://images.unsplash.com/photo-1585032226651-759b368d7246?w=500"},
+{n:"Magnum Kretek 12",k:"Rokok",h:26000,st:18,img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=500"},
+{n:"Magnum Filter 12",k:"Rokok",h:23000,st:12,img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=500"},
+{n:"Sampoerna Mild 16",k:"Rokok",h:35000,st:10,img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=500"},
+{n:"Surya 12",k:"Rokok",h:26000,st:10,img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=500"},
+{n:"Surya 16",k:"Rokok",h:35000,st:8,img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=500"},
+{n:"Marlboro Merah 20",k:"Rokok",h:46000,st:8,img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=500"},
+{n:"Rokok Ketengan Magnum",k:"Rokok",h:2500,st:40,img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=500"},
+{n:"Korek Gas",k:"Rokok",h:4000,st:20,img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=500"},
+{n:"Aqua 600ml",k:"Minuman",h:5000,st:40,img:"https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=500"},
+{n:"Aqua 1.5L",k:"Minuman",h:8000,st:20,img:"https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=500"},
+{n:"Teh Pucuk 350ml",k:"Minuman",h:5000,st:30,img:"https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=500"},
+{n:"Coca Cola 250ml",k:"Minuman",h:7000,st:20,img:"https://images.unsplash.com/photo-1554866585-cd94860890b7?w=500"},
+{n:"Sprite 250ml",k:"Minuman",h:7000,st:20,img:"https://images.unsplash.com/photo-1554866585-cd94860890b7?w=500"},
+{n:"Kopi Kapal Api Sachet",k:"Minuman",h:2500,st:50,img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500"},
+{n:"Chitato",k:"Makanan Ringan",h:9000,st:15,img:"https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=500"},
+{n:"Tango Wafer",k:"Makanan Ringan",h:6000,st:20,img:"https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=500"},
+{n:"Beng-Beng",k:"Makanan Ringan",h:3500,st:40,img:"https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=500"},
+{n:"Oreo",k:"Makanan Ringan",h:8000,st:15,img:"https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=500"},
+{n:"Bawang Merah 1 Kg",k:"Bumbu Dapur",h:35000,st:10,img:"https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?w=500"},
+{n:"Bawang Putih 1 Kg",k:"Bumbu Dapur",h:38000,st:10,img:"https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?w=500"},
+{n:"Masako Ayam",k:"Bumbu Dapur",h:2500,st:50,img:"https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?w=500"},
+{n:"Royco Ayam",k:"Bumbu Dapur",h:2500,st:50,img:"https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?w=500"},
+{n:"Sabun Lifebuoy",k:"Perlengkapan Rumah",h:6000,st:20,img:"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500"},
+{n:"Pepsodent",k:"Perlengkapan Rumah",h:9500,st:15,img:"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500"},
+{n:"Rinso 800g",k:"Perlengkapan Rumah",h:19000,st:12,img:"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500"},
+{n:"Pulsa 10.000",k:"Perlengkapan Rumah",h:12000,st:20,img:"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500"},
+{n:"Token Listrik 20.000",k:"Perlengkapan Rumah",h:22000,st:20,img:"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500"},
+{n:"Gas LPG 3 Kg",k:"Lainnya",h:23000,st:8,img:"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500"},
+{n:"Gas LPG 12 Kg",k:"Lainnya",h:170000,st:3,img:"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500"},
+{n:"Es Batu Kristal",k:"Lainnya",h:5000,st:20,img:"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500"}
+];
+let PERAN='PENJUAL',KAT='Semua',KERANJANG=[],HUTANG=[],RIWAYAT=[],NAMA_WARUNG=localStorage.getItem('syam_nama_warung')||'Aplikasi Warung',WA_WARUNG='6285797240854';
+function rupiah(x){return 'Rp '+(Number(x)||0).toLocaleString('id-ID')}
+function pindahHalaman(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));let el=document.getElementById('page-'+id);if(el)el.classList.add('active');document.querySelectorAll('.topnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');window.scrollTo({top:0,behavior:'smooth'});if(id=='belanja')tampil()}
+function setPeran(p){PERAN=p;let b=document.getElementById('badgeArea');if(b)b.innerHTML='<span class="badge '+(p=='PEMBUAT'?'pembuat':p=='PENJUAL'?'penjual':'pembeli')+'">'+(p=='PEMBELI'?'TANPA LOGIN - PEMBELI':'LOGIN SEBAGAI: '+p)+'</span>';let box=document.getElementById('boxTambah');if(box)box.style.display=(p=='PEMBUAT'||p=='PENJUAL')?'block':'none';tampil()}
+function filterKat(k,el){KAT=k;document.querySelectorAll('#catBar .cat').forEach(e=>e.classList.remove('on'));if(el)el.classList.add('on');pindahHalaman('belanja');tampil()}
+function tampil(){
+let cari=(document.getElementById('cariInput')?document.getElementById('cariInput').value.toLowerCase():'');
+let html='';let count=0;
+BARANG.forEach((b,i)=>{
+if(KAT!=='Semua'&&b.k!==KAT)return;
+if(cari&&!b.n.toLowerCase().includes(cari)&&!b.k.toLowerCase().includes(cari))return;
+count++;
+html+='<div class="item"><img src="'+(b.img||CADANGAN)+'" onerror="this.onerror=null;this.src=\''+CADANGAN+'\'" alt="'+b.n+'"><b>'+b.n+'</b><div class="kat">'+b.k+'</div><div class="harga">'+rupiah(b.h)+'</div><div class="stok">Stok: '+b.st+'</div><div class="row">';
+if(PERAN!=='PEMBELI'){html+='<button onclick="ubahHarga('+i+',-500)">-500</button><button class="edit" onclick="editHarga('+i+')">✏️ Edit</button><button onclick="ubahHarga('+i+',500)">+500</button>';}
+html+='<button class="tambah" onclick="tambahKeranjang('+i+')">+ Tambah</button></div><div class="row"><button onclick="ubahStok('+i+',-1)">- Stok</button><button onclick="ubahStok('+i+',1)">+ Stok</button><button onclick="tambahKeranjang('+i+',1)">+ Ketengan</button></div></div>';
+});
+let daftar=document.getElementById('daftar');if(daftar)daftar.innerHTML=html||'<div class="card">Barang tidak ditemukan. Coba kata lain, contoh: beras, minyak, aqua.</div>';
+let j=document.getElementById('jumlahProduk');if(j)j.innerText='• '+count+' produk • Harga tidak diotak-atik';
+updateKeranjang();
+}
+function ubahHarga(i,d){BARANG[i].h+=d;if(BARANG[i].h<0)BARANG[i].h=0;tampil()}
+function editHarga(i){let h=prompt('Harga baru untuk '+BARANG[i].n+'? (Penjual - Langsung berubah)',BARANG[i].h);if(h!==null&&h!==''){let v=parseInt(h);if(!isNaN(v)&&v>=0){BARANG[i].h=v;alert('Harga '+BARANG[i].n+' jadi '+rupiah(v));tampil()}}}
+function ubahStok(i,d){BARANG[i].st+=d;if(BARANG[i].st<0)BARANG[i].st=0;tampil()}
+function tambahKeranjang(i,ket){let h=BARANG[i].h;if(ket)h=2500;if(BARANG[i].st<=0){alert('Stok '+BARANG[i].n+' habis');return}BARANG[i].st--;KERANJANG.push({n:BARANG[i].n,h:h});RIWAYAT.push({n:BARANG[i].n,h:h,waktu:new Date().toLocaleTimeString('id-ID')});tampil();updateLaporan()}
+function updateKeranjang(){let tot=KERANJANG.reduce((a,b)=>a+b.h,0);let t=document.getElementById('total');if(t)t.innerText=rupiah(tot);let jk=document.getElementById('jumlahKeranjang');if(jk)jk.innerText=KERANJANG.length+' item';let ki=document.getElementById('kasirIsi');if(ki)ki.innerText=KERANJANG.length?KERANJANG.map(x=>x.n+' - '+rupiah(x.h)).join(', '):'Belum ada barang';let kt=document.getElementById('kasirTotal');if(kt)kt.innerText=rupiah(tot);hitungKembalian();let so=document.getElementById('statOmzet');if(so)so.innerText=rupiah(tot);let si=document.getElementById('statItem');if(si)si.innerText=KERANJANG.length;let ss=document.getElementById('statStok');if(ss)ss.innerText=BARANG.filter(b=>b.st<=5).length;let rw=document.getElementById('riwayat');if(rw)rw.innerHTML=RIWAYAT.length?RIWAYAT.slice(-10).reverse().map(r=>'<div style="padding:8px 0;border-bottom:1px solid #eee">'+r.waktu+' - '+r.n+' - '+rupiah(r.h)+'</div>').join(''):'Belum ada transaksi';}
+function hitungKembalian(){let tot=KERANJANG.reduce((a,b)=>a+b.h,0);let bayar=parseInt(document.getElementById('uangBayar')?document.getElementById('uangBayar').value||0:0);let k=document.getElementById('kembalianTampil');if(k)k.innerText=rupiah(Math.max(0,bayar-tot))}
+function kosongkanKeranjang(){KERANJANG=[];let u=document.getElementById('uangBayar');if(u)u.value='';updateKeranjang();tampil()}
+function tambahLangsungPenjual(){let n=document.getElementById('nBaru').value.trim();let k=document.getElementById('kBaru').value;let h=parseInt(document.getElementById('hBaru').value);let st=parseInt(document.getElementById('sBaru').value)||0;if(!n||isNaN(h)){alert('Isi Nama dan Harga dulu');return}BARANG.push({n:n,k:k,h:h,st:st,img:CADANGAN});alert(n+' langsung masuk dan bisa dijual');tampil();pindahHalaman('belanja')}
+function tambahHutang(nominal,nama){let nm=nama||(document.getElementById('namaHutang')?document.getElementById('namaHutang').value.trim():'');let nom=nominal||(document.getElementById('nominalHutang')?parseInt(document.getElementById('nominalHutang').value):NaN);if(!nm||isNaN(nom)){alert('Isi Nama dan Nominal Hutang');return}HUTANG.push({nama:nm,nom:nom,lunas:false});tampilHutang();updateLaporan()}
+function tambahHutangDariKasir(){let tot=KERANJANG.reduce((a,b)=>a+b.h,0);if(!tot){alert('Keranjang kosong');return}let nm=prompt('Nama pelanggan hutang?','Budi');if(nm)tambahHutang(tot,nm)}
+function tampilHutang(){let d=document.getElementById('daftarHutang');if(!d)return;if(!HUTANG.length){d.innerHTML='<p style="color:#64748b">Belum ada hutang.</p>';return}d.innerHTML=HUTANG.map((h,idx)=>'<div style="padding:10px;border:1px solid #eee;border-radius:12px;margin:8px 0;display:flex;justify-content:space-between"><span><b>'+h.nama+'</b><br>'+rupiah(h.nom)+' - '+(h.lunas?'✅ LUNAS':'⏳ BELUM LUNAS')+'</span><button onclick="lunasHutang('+idx+')" style="padding:8px 12px;border:none;border-radius:10px;background:#22c55e;color:#fff;font-weight:800">LUNAS</button></div>').join('')}
+function lunasHutang(i){HUTANG[i].lunas=true;tampilHutang();updateLaporan()}
+function updateLaporan(){let tot=KERANJANG.reduce((a,b)=>a+b.h,0);let ht=HUTANG.filter(h=>!h.lunas).reduce((a,b)=>a+b.nom,0);let o=document.getElementById('lapOmzet');if(o)o.innerText=rupiah(tot);let lh=document.getElementById('lapHutang');if(lh)lh.innerText=rupiah(ht);let li=document.getElementById('lapItem');if(li)li.innerText=KERANJANG.length;let ls=document.getElementById('lapStok');if(ls)ls.innerText=BARANG.filter(b=>b.st<=5).map(b=>b.n+' ('+b.st+')').join(', ')||'Aman';tampilHutang()}
+function simpanNamaWarung(){let n=document.getElementById('inputNamaWarung').value.trim();if(n){NAMA_WARUNG=n;localStorage.setItem('syam_nama_warung',n);let t=document.getElementById('namaWarungTampil');if(t)t.innerText=n+' - bisa dirubah Penjual';alert('Nama warung jadi: '+n)}}
+function loginPusat(){let u=document.getElementById('userLogin').value.trim();if(u==='Pusat83'||u==='atalla01')setPeran('PEMBUAT');else if(u==='JUAL-A83K')setPeran('PENJUAL');else setPeran('PEMBELI');alert('Login sebagai: '+PERAN);pindahHalaman('beranda')}
+function waPembuat(){window.open('https://wa.me/'+WA_WARUNG)}
+function kirimStruk(){let tot=KERANJANG.reduce((a,b)=>a+b.h,0);if(!tot){alert('Keranjang kosong');return}let teks='🏪 '+NAMA_WARUNG+' - SYAM-V11.7%0A'+KERANJANG.map(x=>x.n+' - '+rupiah(x.h)).join('%0A')+'%0ATotal: '+rupiah(tot)+'%0AKasir: '+PERAN+'%0ATerima kasih';window.open('https://wa.me/'+WA_WARUNG+'?text='+teks)}
+function kirimLaporanWA(){let tot=KERANJANG.reduce((a,b)=>a+b.h,0);let ht=HUTANG.filter(h=>!h.lunas).reduce((a,b)=>a+b.nom,0);let teks='📊 LAPORAN SYAM-V11.7%0AOmzet: '+rupiah(tot)+'%0AHutang: '+rupiah(ht)+'%0AItem: '+KERANJANG.length;window.open('https://wa.me/'+WA_WARUNG+'?text='+encodeURIComponent(teks))}
+let saved=localStorage.getItem('syam_nama_warung');if(saved){NAMA_WARUNG=saved;let t=document.getElementById('namaWarungTampil');if(t)t.innerText=saved+' - bisa dirubah Penjual'}
+setPeran('PENJUAL');updateLaporan();
+</script>
+</body></html>
